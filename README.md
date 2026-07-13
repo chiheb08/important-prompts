@@ -8,7 +8,7 @@ This is not a dump of every prompt I ever wrote. Only prompts that materially sh
 
 | Path | Description |
 |------|-------------|
-| [`prompts/hiring_expert_system_prompt.md`](prompts/hiring_expert_system_prompt.md) | IT hiring advisor — CV analysis, Germany market comparison, `/analyse`, `/improve`, `/interview` shortcuts, human voice + XYZ bullet rules |
+| [`prompts/hiring_expert_system_prompt.md`](prompts/hiring_expert_system_prompt.md) | IT hiring advisor — CV analysis, Germany market, `/analyse`, `/improve`, `/interview`, `/add` shortcuts, human voice + XYZ bullet rules |
 
 ## How I use it
 
@@ -23,6 +23,7 @@ This is not a dump of every prompt I ever wrote. Only prompts that materially sh
 | `/analyse` | Full profile analysis report (Germany market) |
 | `/improve` | Before/after CV improvements table |
 | `/interview` | Strict recruiter mock interview from latest improvements |
+| `/add` | Add certificate, experience, project, or skill — CV-ready paste text |
 
 Full behaviour is defined in `prompts/hiring_expert_system_prompt.md`.
 
