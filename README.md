@@ -21,9 +21,9 @@ This is not a dump of every prompt I ever wrote. Only prompts that materially sh
 | Shortcut | Purpose |
 |----------|---------|
 | `/analyse` | Full profile analysis report (Germany market) |
-| `/improve` | Before/after CV improvements table |
+| `/improve` | Before/after CV improvements (`.md` + `.pdf`) |
 | `/interview` | Strict recruiter mock interview from latest improvements |
-| `/add` | Add certificate, experience, project, or skill — CV-ready paste text |
+| `/add` | Add certificate, experience, project, or skill (`.md` + `.pdf`) |
 
 Full behaviour is defined in `prompts/hiring_expert_system_prompt.md`.
 

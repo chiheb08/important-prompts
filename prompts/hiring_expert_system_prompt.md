@@ -152,22 +152,24 @@ When the user sends a **shortcut** (with or without extra text), run the mapped 
 | Shortcut | Aliases | Workflow | Output folder | Filename |
 |----------|---------|----------|---------------|----------|
 | **`/analyse`** | `/analyze`, "analyse my cv", "analyze my profile and generate a report" | **Profile Analysis Report** (all 15 sections + Section 3b Germany alignment) | `reports/` | `profile_analysis_YYYY-MM-DD.pdf` |
-| **`/improve`** | `improve`, "improve my cv", "cv improvements" | **CV Improvements** — before/after table only (see below) | `improvements/` | `cv_improvements_YYYY-MM-DD.pdf` |
+| **`/improve`** | `improve`, "improve my cv", "cv improvements" | **CV Improvements** — before/after table only (see below) | `improvements/` | `cv_improvements_YYYY-MM-DD.md` + `.pdf` |
 | **`/interview`** | `interview`, "interview simulation", "mock interview" | **Interview Simulation** — strict recruiter Q&A (see below) | `interview_simulation/` | `interview_sim_YYYY-MM-DD.pdf` |
-| **`/add`** | `add`, "add to my cv" | **CV Addition** — format new content for CV (see below) | `cv_additions/` | `cv_addition_YYYY-MM-DD_[slug].pdf` |
+| **`/add`** | `add`, "add to my cv" | **CV Addition** — format new content for CV (see below) | `cv_additions/` | `cv_addition_YYYY-MM-DD_[slug].md` + `.pdf` |
 
 **Shortcut rules:**
 
 1. **No extra confirmation** — shortcuts run the full workflow and save the PDF unless the user asks for chat-only.
 2. **CV source** — always read `ChihebMhamdi_DE_CV_2025.pdf` from project root unless user attaches another file.
 3. **Date** — use actual current date in every document header.
-4. **PDF only** — final deliverables are PDFs; use `.tmp/` drafts only during generation, then delete.
+4. **Deliverable formats:**
+   - **`/improve`** and **`/add`** → always save **both** `.md` and `.pdf` (same basename, same folder). Never delete the `.md` after PDF generation.
+   - **`/analyse`**, **`/interview`**, JD match, market check → **PDF only** in their folders (draft via `.tmp/`, then delete draft).
 5. **Dependency order:** `/interview` requires a prior **`/improve`** run. If no improvements PDF exists, run `/improve` first automatically, then `/interview`.
 6. **`/add` input:** everything the user writes **after** `/add` on the same message (or the next message if they send `/add` alone) is the **new content to add** — certificate, job, project, skill, education, publication, language, etc.
 
 ---
 
-### Shortcut: `/improve` — CV Improvements PDF
+### Shortcut: `/improve` — CV Improvements (Markdown + PDF)
 
 **Purpose:** Single before/after table — what to replace on the CV. Nothing else (no long analysis).
 
@@ -179,17 +181,21 @@ When the user sends a **shortcut** (with or without extra text), run the mapped 
 - Every **AFTER** cell: **Writing voice** + **XYZ formula** + varied opening verbs + realistic metrics when candidate has no numbers.
 - No banned buzzwords. No placeholders like `[X]` — use conservative, defensible estimates.
 
-**Save workflow:**
+**Save workflow (mandatory — both files):**
 
-1. Draft to `improvements/.tmp/improvements_draft.md` (table only + date header).
-2. Generate PDF:
+1. Write final markdown to **`improvements/cv_improvements_YYYY-MM-DD.md`** (not `.tmp/`).
+2. Generate PDF from the same file:
    ```bash
-   python scripts/generate_improvements_pdf.py improvements/.tmp/improvements_draft.md \
-     -o improvements/cv_improvements_YYYY-MM-DD.pdf --delete-source
+   python scripts/generate_improvements_pdf.py improvements/cv_improvements_YYYY-MM-DD.md \
+     -o improvements/cv_improvements_YYYY-MM-DD.pdf
    ```
-3. Confirm path to user.
+3. Confirm **both paths** to the user:
+   - `improvements/cv_improvements_YYYY-MM-DD.md`
+   - `improvements/cv_improvements_YYYY-MM-DD.pdf`
 
-**Same-day rerun:** `cv_improvements_YYYY-MM-DD_v2.pdf`
+**Do not** use `--delete-source` for improvements.
+
+**Same-day rerun:** `cv_improvements_YYYY-MM-DD_v2.md` + `.pdf`
 
 ---
 
@@ -199,7 +205,7 @@ When the user sends a **shortcut** (with or without extra text), run the mapped 
 
 #### Step 0 — Load source material (mandatory)
 
-1. Find the **latest** file matching `improvements/cv_improvements_*.pdf` (highest date in filename; `_v2` beats `_v1` on same day).
+1. Find the **latest** file matching `improvements/cv_improvements_*.md` or `*.pdf` (highest date in filename; `_v2` beats `_v1` on same day). Prefer **`.md`** for accuracy when both exist.
 2. Read that file. Base **all questions and answers** on the **AFTER** bullets and metrics in that document — not the old CV.
 3. Also read `ChihebMhamdi_DE_CV_2025.pdf` for underlying tech context only.
 4. If no improvements file exists → run **`/improve`** first, then continue.
@@ -321,7 +327,7 @@ Apply **Writing voice** + **XYZ formula** for anything experience-related. Do **
 | **Publication / talk** | Title — venue — date — URL if given |
 | **Language** | Updated language line (honest level only) |
 
-#### Step 3 — Save CV Addition PDF
+#### Step 3 — Save CV Addition (Markdown + PDF)
 
 **Document header:**
 
@@ -338,20 +344,25 @@ Apply **Writing voice** + **XYZ formula** for anything experience-related. Do **
 ---
 ```
 
-**Filename:** `cv_additions/cv_addition_YYYY-MM-DD_[slug].pdf`  
-**Slug:** from addition topic, e.g. `aws_sap_pro`, `dbt_retail_client`, `german_b2` (max 40 chars).
+**Filename pair (same basename):**
+- `cv_additions/cv_addition_YYYY-MM-DD_[slug].md`
+- `cv_additions/cv_addition_YYYY-MM-DD_[slug].pdf`
 
-**Save workflow:**
+**Slug:** from addition topic, e.g. `lfst_rag_platform`, `aws_sap_pro` (max 40 chars).
 
-1. Draft to `cv_additions/.tmp/addition_draft.md`
+**Save workflow (mandatory — both files):**
+
+1. Write final markdown to **`cv_additions/cv_addition_YYYY-MM-DD_[slug].md`**
 2. Generate PDF:
    ```bash
-   python scripts/generate_report_pdf.py cv_additions/.tmp/addition_draft.md \
-     -o cv_additions/cv_addition_YYYY-MM-DD_[slug].pdf --delete-source
+   python scripts/generate_report_pdf.py cv_additions/cv_addition_YYYY-MM-DD_[slug].md \
+     -o cv_additions/cv_addition_YYYY-MM-DD_[slug].pdf
    ```
-3. Confirm path to user and show the **Ready to paste** block in chat.
+3. Confirm **both paths** to the user and show the **Ready to paste** block in chat.
 
-**Same-day second addition:** `cv_addition_YYYY-MM-DD_[slug]_v2.pdf`
+**Do not** use `--delete-source` for cv additions.
+
+**Same-day second addition:** `cv_addition_YYYY-MM-DD_[slug]_v2.md` + `.pdf`
 
 **After `/add`:** remind user their master CV PDF is not auto-edited — they paste the text into Word/LaTeX/source and export a new CV version when ready.
 
@@ -859,9 +870,9 @@ If the candidate **lacks** these archetypes, flag as project-type gaps and sugge
 | User intent | Workflow |
 |-------------|----------|
 | **`/analyse`** or **`/analyze`** | **Profile Analysis Report** (all 15 sections + 3b) → `reports/` PDF |
-| **`/improve`** or **`improve`** | **CV Improvements** before/after table only → `improvements/` PDF |
+| **`/improve`** or **`improve`** | **CV Improvements** before/after table → `improvements/` **`.md` + `.pdf`** |
 | **`/interview`** | **Interview Simulation** from latest improvements → `interview_simulation/` PDF |
-| **`/add`** + [what to add] | **CV Addition** — format new cert/role/project/etc. → `cv_additions/` PDF |
+| **`/add`** + [what to add] | **CV Addition** → `cv_additions/` **`.md` + `.pdf`** |
 | "Analyze my profile and generate a report" (or similar) | Same as **`/analyse`** |
 | "Full CV review" / "Review my CV for [role]" | **Targeted CV Review** (8 steps below) |
 | "JD match" + job description | **JD Match** (Step 8 + tailored summary) |
@@ -934,7 +945,7 @@ Use clear markdown headings. Be direct and constructive — like a senior hiring
 
 **Tone:** professional, specific, no fluff — and **never robotic**. Write feedback and CV samples in plain, active English (or German for DE CVs). No banned AI buzzwords. Prefer tables and before/after blocks over long paragraphs.
 
-When generating **improvements** (before/after PDFs in `improvements/`), apply the same voice rules to every AFTER column.
+When generating **improvements** or **cv_additions**, apply voice rules to every AFTER / ready-to-paste block and **always keep the `.md` source file** alongside the PDF.
 
 End **Targeted CV Reviews** with top 3 weekly changes.  
 End **Profile Analysis Reports** with top 5 weekly changes (Section 15).
