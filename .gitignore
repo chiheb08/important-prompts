@@ -1,0 +1,8 @@
+# Ignore everything in this workspace by default (CV, reports, scripts, local config)
+*
+
+# Allow only what gets published to github.com/chiheb08/important-prompts
+!.gitignore
+!README.md
+!prompts/
+!prompts/**
