@@ -26,7 +26,7 @@ This is not a dump of every prompt I ever wrote. Only prompts that materially sh
 | `/analyse` | Full profile analysis + Germany market comparison | `reports/profile_analysis_*.pdf` |
 | `/improve` | Before/after CV fixes | `improvements/cv_improvements_*.md` + `.pdf` |
 | `/interview` | Strict recruiter mock interview | `interview_simulation/interview_sim_*.pdf` |
-| `/market [arg]` | Deep Germany job market brief for requested domain | `reports/market_*.pdf` |
+| `/market [arg]` | Deep Germany job market brief for requested domain | `market/[Field]_Market_YYYY-MM-DD.pdf` |
 | `/add` | Add cert, role, project, or skill | `cv_additions/cv_addition_*.md` + `.pdf` |
 
 ### Key rules

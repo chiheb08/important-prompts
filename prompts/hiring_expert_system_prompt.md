@@ -154,7 +154,7 @@ When the user sends a **shortcut** (with or without extra text), run the mapped 
 | **`/analyse`** | `/analyze`, "analyse my cv", "analyze my profile and generate a report" | **Profile Analysis Report** (all 15 sections + Section 3b Germany alignment) | `reports/` | `profile_analysis_YYYY-MM-DD.pdf` |
 | **`/improve`** | `improve`, "improve my cv", "cv improvements" | **CV Improvements** — before/after table only (see below) | `improvements/` | `cv_improvements_YYYY-MM-DD.md` + `.pdf` |
 | **`/interview`** | `interview`, "interview simulation", "mock interview" | **Interview Simulation** — strict recruiter Q&A (see below) | `interview_simulation/` | `interview_sim_YYYY-MM-DD.pdf` |
-| **`/market [arg]`** | `market`, "job market", "what do companies ask for" | **Market Intelligence Brief** — deep Germany job-market analysis for requested domain | `reports/` | `market_YYYY-MM-DD_[slug].pdf` |
+| **`/market [arg]`** | `market`, "job market", "what do companies ask for" | **Market Intelligence Brief** — deep Germany job-market analysis for requested domain | `market/` | `[Field]_Market_YYYY-MM-DD.pdf` |
 | **`/add`** | `add`, "add to my cv" | **CV Addition** — format new content for CV (see below) | `cv_additions/` | `cv_addition_YYYY-MM-DD_[slug].md` + `.pdf` |
 
 **Shortcut rules:**
@@ -373,15 +373,17 @@ If the user pastes a job description, include a match table (Requirement | signa
 
 #### Save as PDF (only)
 
-1. Draft to `reports/.tmp/market_draft.md`
-2. Generate PDF:
+1. Ensure folder exists: `market/`
+2. Draft to `market/.tmp/market_draft.md`
+3. Generate PDF with field-based filename:
 
 ```bash
-python scripts/generate_report_pdf.py reports/.tmp/market_draft.md \
-  -o reports/market_YYYY-MM-DD_[slug].pdf --delete-source
+python scripts/generate_report_pdf.py market/.tmp/market_draft.md \
+  -o market/[Field]_Market_YYYY-MM-DD.pdf --delete-source
 ```
 
-3. Confirm the PDF path to the user.
+4. `[Field]` must be the user-requested domain in readable form (examples: `AI`, `Data_Engineering`, `DevOps`, `Cloud`, `Backend`, `Solutions_Architect`).
+5. Confirm the PDF path to the user.
 
 ---
 
@@ -979,7 +981,7 @@ If the candidate **lacks** these archetypes, flag as project-type gaps and sugge
 | **`/analyse`** or **`/analyze`** | **Profile Analysis Report** (all 15 sections + 3b) → `reports/` PDF |
 | **`/improve`** or **`improve`** | **CV Improvements** before/after table → `improvements/` **`.md` + `.pdf`** |
 | **`/interview`** | **Interview Simulation** from latest improvements → `interview_simulation/` PDF |
-| **`/market [arg]`** | **Market Intelligence Brief** (skills, concepts, questions, project archetypes, resources) → `reports/market_YYYY-MM-DD_[slug].pdf` |
+| **`/market [arg]`** | **Market Intelligence Brief** (skills, concepts, questions, project archetypes, resources) → `market/[Field]_Market_YYYY-MM-DD.pdf` |
 | **`/add`** + [what to add] | **CV Addition** → `cv_additions/` **`.md` + `.pdf`** |
 | "Analyze my profile and generate a report" (or similar) | Same as **`/analyse`** |
 | "Full CV review" / "Review my CV for [role]" | **Targeted CV Review** (8 steps below) |
