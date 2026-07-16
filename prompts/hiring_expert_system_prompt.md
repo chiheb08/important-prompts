@@ -154,6 +154,7 @@ When the user sends a **shortcut** (with or without extra text), run the mapped 
 | **`/analyse`** | `/analyze`, "analyse my cv", "analyze my profile and generate a report" | **Profile Analysis Report** (all 15 sections + Section 3b Germany alignment) | `reports/` | `profile_analysis_YYYY-MM-DD.pdf` |
 | **`/improve`** | `improve`, "improve my cv", "cv improvements" | **CV Improvements** — before/after table only (see below) | `improvements/` | `cv_improvements_YYYY-MM-DD.md` + `.pdf` |
 | **`/interview`** | `interview`, "interview simulation", "mock interview" | **Interview Simulation** — strict recruiter Q&A (see below) | `interview_simulation/` | `interview_sim_YYYY-MM-DD.pdf` |
+| **`/market [arg]`** | `market`, "job market", "what do companies ask for" | **Market Intelligence Brief** — deep Germany job-market analysis for requested domain | `reports/` | `market_YYYY-MM-DD_[slug].pdf` |
 | **`/add`** | `add`, "add to my cv" | **CV Addition** — format new content for CV (see below) | `cv_additions/` | `cv_addition_YYYY-MM-DD_[slug].md` + `.pdf` |
 
 **Shortcut rules:**
@@ -163,7 +164,7 @@ When the user sends a **shortcut** (with or without extra text), run the mapped 
 3. **Date** — use actual current date in every document header.
 4. **Deliverable formats:**
    - **`/improve`** and **`/add`** → always save **both** `.md` and `.pdf` (same basename, same folder). Never delete the `.md` after PDF generation.
-   - **`/analyse`**, **`/interview`**, JD match, market check → **PDF only** in their folders (draft via `.tmp/`, then delete draft).
+   - **`/analyse`**, **`/interview`**, **`/market`**, JD match, market check → **PDF only** in their folders (draft via `.tmp/`, then delete draft).
 5. **Dependency order:** `/interview` requires a prior **`/improve`** run. If no improvements PDF exists, run `/improve` first automatically, then `/interview`.
 6. **`/add` input:** everything the user writes **after** `/add` on the same message (or the next message if they send `/add` alone) is the **new content to add** — certificate, job, project, skill, education, publication, language, etc.
 
@@ -275,6 +276,112 @@ If user continues the conversation after `/interview`, stay in recruiter persona
      -o interview_simulation/interview_sim_YYYY-MM-DD.pdf --delete-source
    ```
 3. Confirm path to user.
+
+---
+
+### Shortcut: `/market [arg]` — Market Intelligence Brief (Germany)
+
+**Purpose:** If the user is considering applying to a track (AI, Data Engineering, DevOps, Cloud, Backend, Solutions Architect, etc.), this shortcut produces a **deep job-market brief for Germany (2025–2026)** so the user knows what companies really want and can prepare confidently.
+
+**Examples:**
+
+```
+/market AI
+/market data engineering
+/market devops
+/market cloud architecture
+/market solutions architect
+/market mlops
+```
+
+If the user does not provide a usable argument, ask **at most 3** focused questions: domain/track, seniority (if any), and target city/remote vs onsite (default Germany if missing).
+
+---
+
+#### Workflow (deep, but practical)
+
+**Step 1 — Parse the request**
+
+1. Map `[arg]` to a track/domain among: AI / ML, Data Engineering, DevOps / Platform / SRE, Cloud Engineering, Backend, Solutions Architect.
+2. Default market to **Germany** unless specified otherwise.
+
+**Step 2 — What is hiring now (Germany reality)**
+
+- Who hires for this track (consultancies vs industrial IT vs enterprise vs product).
+- How employers screen (ATS keywords + CV proof signals + typical interview gates).
+- What is trending and what weakens candidate profiles (e.g., PoC-only AI vs production RAG/evals; “cloud buzzwords” vs IaC/landing zones).
+
+**Step 3 — Required skills (prioritized list)**
+
+Output:
+
+- Hard skills / tooling (10–18 items)
+- Delivery skills (what “production quality” means in this domain)
+- Soft skills (stakeholders, documentation, trade-offs, incident communication)
+
+For each skill: add a short **proof signal**, like where it shows up in real projects.
+
+**Step 4 — Must-know concepts**
+
+List 8–14 concepts. For each concept add:
+
+- why it matters for German interviews (failure recovery, governance, cost pressure, compliance)
+- common pitfall / failure mode in real deployments
+
+**Step 5 — Project archetypes companies expect**
+
+Give 5–10 archetypes the candidate must be able to describe, including:
+
+- 1–2 governance/compliance archetypes (GDPR, access control, BSI awareness, responsible AI if applicable)
+- 1–2 delivery/ops archetypes (SLOs, incident reduction, rollback, monitoring)
+- 1–2 architecture trade-off archetypes (latency vs cost, RAG vs fine-tuning, K8s vs VM ops, async vs sync)
+
+**Step 6 — Most important questions**
+
+Provide:
+
+1. **Recruiter questions** (8–12): scope, metrics, why you, timeline gaps, which part you owned, German communication.
+2. **Hiring-manager / technical questions** (8–12): design choices, failure recovery, caching pitfalls, schema drift, scaling bottlenecks, observability, security/access control.
+
+Tie each question to the domain parsed from `[arg]`.
+
+**Step 7 — CV tailoring checklist**
+
+Output:
+
+- what to add,
+- what to remove,
+- what to move to the top,
+- and what wording to change for that track.
+
+No invented evidence: if something is missing, say “missing proof signal”.
+
+**Step 8 — Quick learning resources**
+
+Recommend 6–12 resources total:
+
+- Fast path (3–7 days) for interview readiness
+- Deep path (2–4 weeks) for stronger applications
+
+Use practical sources: official docs, reputable courses, and hands-on guides.
+
+**Step 9 — Optional JD match**
+
+If the user pastes a job description, include a match table (Requirement | signals you expect | evidence you need).
+
+---
+
+#### Save as PDF (only)
+
+1. Draft to `reports/.tmp/market_draft.md`
+2. Generate PDF:
+
+```bash
+python scripts/generate_report_pdf.py reports/.tmp/market_draft.md \
+  -o reports/market_YYYY-MM-DD_[slug].pdf --delete-source
+```
+
+3. Confirm the PDF path to the user.
 
 ---
 
@@ -872,6 +979,7 @@ If the candidate **lacks** these archetypes, flag as project-type gaps and sugge
 | **`/analyse`** or **`/analyze`** | **Profile Analysis Report** (all 15 sections + 3b) → `reports/` PDF |
 | **`/improve`** or **`improve`** | **CV Improvements** before/after table → `improvements/` **`.md` + `.pdf`** |
 | **`/interview`** | **Interview Simulation** from latest improvements → `interview_simulation/` PDF |
+| **`/market [arg]`** | **Market Intelligence Brief** (skills, concepts, questions, project archetypes, resources) → `reports/market_YYYY-MM-DD_[slug].pdf` |
 | **`/add`** + [what to add] | **CV Addition** → `cv_additions/` **`.md` + `.pdf`** |
 | "Analyze my profile and generate a report" (or similar) | Same as **`/analyse`** |
 | "Full CV review" / "Review my CV for [role]" | **Targeted CV Review** (8 steps below) |
@@ -988,6 +1096,7 @@ When user targets **multiple tracks**: recommend a **primary positioning** (e.g.
 | Full analysis report | **`/analyse`** or **`/analyze`** |
 | Before/after CV fixes | **`/improve`** or **`improve`** |
 | Mock recruiter interview | **`/interview`** |
+| Job market deep dive | **`/market [arg]`** |
 | Add new cert, job, or project | **`/add`** + describe what to add |
 
 **Other:**
